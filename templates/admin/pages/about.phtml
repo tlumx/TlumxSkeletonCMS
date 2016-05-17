@@ -1,0 +1,182 @@
+<?php
+$title = $this->getTitle();
+if($title) {
+    $this->setTitle($title." :: ".$this->t->translate('Page About'));
+} else {
+    $this->setTitle($this->t->translate('Page About'));
+}
+?><div class="row">
+            <div class="col-lg-12">
+                <br>
+                <ol class="breadcrumb text-capitalize">
+                    <li><a href="<?= $this->router->createPath('index'); ?>"><?= $this->t->translate("Home"); ?></a></li>
+                    <li class="active text-lowercase"><?= $this->t->translate('Page About'); ?></li>
+                </ol>                    
+            </div>
+        </div>
+
+        <div class="page-header">
+        <h2><?= $this->t->translate('Page About'); ?></h2>
+        </div>
+
+        <div class="alert alert-info">
+<?php foreach ($this->languages->getLanguages() as $key=>$value): ?>
+            <a href="<?= $this->router->createPath('pages_about', ['lang'=>$key]); ?>" class="btn btn-primary <?= ($this->currLang ==  $key) ? 'disabled' : '' ?>"><?= $value ?></a>
+<?php endforeach; ?>
+        </div>
+
+
+<?php if(isset($this->isError)): ?>                
+                <div class="message-info-alert response-alert-error">
+                    <div class="alert alert-danger">                
+                        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                        <span class="message"><?= $this->t->translate($this->isError);?>!</span>
+                    </div>
+                </div>                
+<?php endif;?>
+<?php if(isset($this->isSave)): ?>                
+                <div class="message-info-alert response-alert-ok">
+                    <div class="alert alert-success">                
+                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                        <span class="message"><?= $this->t->translate($this->isSave); ?>!</span>
+                    </div>
+                </div>                
+<?php endif;?>
+        <form id="create-about-form" role="form" action="<?= $this->router->createPath('pages_about', ['lang'=>$this->currLang]); ?>" method="POST">
+            <div class="control-group">                
+                <div class="controls">                    
+                    <textarea class="form-control" id="about-text" name="about-text" rows="15"><?= $this->text ?></textarea>
+                </div>
+            </div>   
+            <br>    
+            <div class="control-group">
+               <div class="controls">
+                   <button type="submit" class="btn btn-primary"><?= $this->t->translate("Save"); ?></button>
+               </div>
+           </div>
+        </form>
+<?php
+$this->appendAfterBodyScript($this->basePath.'/js/tinymce/js/tinymce/tinymce.min.js');
+$editorLang = $this->languages->getCurrentLanguage();
+$this->setPlainCss(".navbar-fixed-bottom, .navbar-fixed-top{z-index: 100;}");
+
+$selectFileTitle = $this->t->translate('Select the file to insert');
+$leFinderRoute = $this->router->createPath('filemanager_tinymce');
+$str = <<<EOD
+tinymce.init({
+    selector: "textarea#about-text",
+    theme: "modern",
+    language: "$editorLang",
+    content_css : "$this->basePath/css/tinymce_content.css",
+    fontsize_formats: "8px 9px 10px 12px 13px 14px 16px 18px 21px 24px 28px 32px 36px 42px",
+    plugins: [
+         "advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker",
+         "searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking",
+         "save table contextmenu directionality emoticons template paste textcolor colorpicker"
+   ],
+   toolbar1: "insertfile undo redo | styleselect | fontselect fontsizeselect | bold italic | alignleft aligncenter alignright alignjustify | forecolor backcolor | outdent indent", 
+   toolbar2: "bullist numlist | link image media | preview fullpage | emoticons charmap | code fullscreen",
+   style_formats: [
+        {title: 'Image Left', selector: 'img', styles: {
+            'float' : 'left', 
+            'margin': '0 10px 10px 0'
+        }},
+        {title: 'Image Right', selector: 'img', styles: {
+            'float' : 'right', 
+            'margin': '0 0 10px 10px'
+        }},
+        {title: "Headers", items: [
+            {title: "Header 1", format: "h1"},
+            {title: "Header 2", format: "h2"},
+            {title: "Header 3", format: "h3"},
+            {title: "Header 4", format: "h4"},
+            {title: "Header 5", format: "h5"},
+            {title: "Header 6", format: "h6"}
+        ]},
+        {title: "Blocks", items: [
+            {title: "Paragraph", format: "p"},
+            {title: "Blockquote", format: "blockquote"},
+            {title: "Div", format: "div"},
+            {title: "Pre", format: "pre"}
+        ]},
+           
+    ],
+    file_picker_callback : elFinderBrowser,
+    relative_urls: false,
+    //remove_script_host: false
+ }); 
+  
+function elFinderBrowser (callback, value, meta) {
+    tinymce.activeEditor.windowManager.open({
+        file: '$leFinderRoute',// use an absolute path!
+        title: '$selectFileTitle',
+        width: 900,	
+        height: 600,
+        resizable: 'yes'
+    }, {
+        oninsert: function (file, elf) {
+            var url, reg, info;
+
+            // URL normalization
+            url = file.url;
+            reg = /\/[^/]+?\/\.\.\//;
+            while(url.match(reg)) {
+              url = url.replace(reg, '/');
+            }
+
+            // Make file info
+            info = file.name + ' (' + elf.formatSize(file.size) + ')';
+
+            // Provide file and text for the link dialog
+            if (meta.filetype == 'file') {
+              callback(url, {text: info, title: info});
+            }
+
+            // Provide image and alt text for the image dialog
+            if (meta.filetype == 'image') {
+              callback(url, {alt: info});        
+            }
+
+            // Provide alternative source and posted for the media dialog
+            if (meta.filetype == 'media') {
+              callback(url);
+            }
+        }
+    });
+    return false;
+}                
+EOD;
+$this->appendAfterBodyScript($str, false);
+
+
+
+$str = "   ". 
+"$(document).ready(function(){
+    function slideout(){
+        setTimeout(function(){
+            $(\".response-alert-ok\").slideUp(\"slow\", function () {
+        });
+        }, 3000);
+    }
+
+    slideout();
+})";
+if(isset($this->isSave)) {
+    $this->appendAfterBodyScript($str, false);  
+}
+
+$str = "   ". 
+"$(document).ready(function(){
+    function slideout(){
+        setTimeout(function(){
+            $(\".response-alert-error\").slideUp(\"slow\", function () {
+        });
+        }, 3000);
+    }
+
+    slideout();
+})";
+if(isset($this->isError)) {
+    $this->appendAfterBodyScript($str, false);  
+}
+?>

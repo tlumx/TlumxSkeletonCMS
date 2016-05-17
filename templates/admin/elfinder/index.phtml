@@ -1,0 +1,38 @@
+<?php
+$title = $this->getTitle();
+if($title) {
+    $this->setTitle($title." :: ".$this->t->translate('File manager'));
+} else {
+    $this->setTitle($this->t->translate('File manager'));
+}
+$connectorUri = $this->router->createPath('filemanager_connector');
+
+$lang = $this->languages->getCurrentLanguage();
+if($lang == 'ja') {
+    $lang = 'jp';
+} elseif ($lang == 'pt') {
+    $lang = 'pt_BR';
+} elseif($lang == 'zh') {
+    $lang = 'zh_TW';
+}
+
+$this->setStylesheet($this->basePath . '/css/jquery-ui.css');
+$this->setStylesheet($this->basePath . '/css/elfinder.min.css');
+$this->setStylesheet($this->basePath . '/css/theme.css');
+$this->appendAfterBodyScript($this->basePath.'/js/jquery-ui.min.js');
+$this->appendAfterBodyScript($this->basePath.'/js/elfinder/elfinder.min.js');
+if($lang != 'en') {
+    $this->appendAfterBodyScript($this->basePath.'/js/elfinder/i18n/elfinder.'.$lang.'.js');
+}
+
+$str = <<<EOD
+    $().ready(function() {
+        var elf = $('#elfinder').elfinder({
+            lang: '$lang',             // language (OPTIONAL)
+            url : '$connectorUri'  // connector URL (REQUIRED)]
+        }).elfinder('instance');            
+    });    
+EOD;
+$this->appendAfterBodyScript($str, false);
+        
+?><div id="elfinder"></div>

@@ -1,0 +1,8 @@
+<?php
+$title = $this->getTitle();
+if($title) {
+    $this->setTitle($title." :: ".$this->t->translate('Forbidden'));
+} else {
+    $this->setTitle($this->t->translate('Forbidden'));
+}
+?><h1>Forbidden</h1>

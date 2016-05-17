@@ -1,0 +1,158 @@
+<?php
+
+$title = $this->getTitle();
+if($title) {
+    $this->setTitle($title . ' :: Contact');
+} else {
+    $this->setTitle('Contact');
+}
+
+$this->appendAfterBodyScript($this->basePath.'/js/jqBootstrapValidation.js');
+$this->appendAfterBodyScript('https://www.google.com/recaptcha/api.js');
+$this->appendAfterBodyScript("
+        $(document).ready(function(){        
+            $(document).ajaxStart(function () {
+                jQuery('#loading').fadeIn(300);
+                jQuery('body').css('cursor', 'wait');
+            });
+            $(document).ajaxStop(function () {
+                jQuery('#loading').fadeOut(300);
+                jQuery('body').css('cursor', 'default');     
+            }); 
+        });
+", false);
+?><div class="container">
+        <h2 class="page-header text-capitalize"><?= $this->t->translate('Contact Us')?></h2>
+        <div class="col-lg-12">                
+            <form action="#" name="sentMessage" class="form-horizontal " id="contactForm"  novalidate>                                          
+
+                <div class="form-group success-contact-group row">
+                    <div id="success"></div> <!-- For success/fail messages -->
+                </div>                            
+
+                <div class="form-group control-group row">
+                    <input type="text" name="name" class="form-control" required  placeholder="<?= $this->t->translate('Your name') ?>" id="name" data-validation-required-message="<?= $this->t->translate('Please enter your name') ?>" minlength="2" data-validation-minlength-message="<?= $this->t->translate('Too short: Minimum of \'2\' characters') ?>" maxlength="50" data-validation-maxlength-message="<?= $this->t->translate('Too long: Maximum of \'50\' characters') ?>">
+                    <p class="help-block"></p>                  
+                </div>
+
+                <div class="form-group control-group row">
+                    <input class="form-control" name="email" type="email" placeholder="<?= $this->t->translate('Your Email') ?>" id="email" data-validation-email-message="<?= $this->t->translate('Not a valid email address'); ?>" required data-validation-required-message="<?= $this->t->translate('Please enter your email') ?>" />               
+                    <p class="help-block"></p>
+                </div>
+
+                <div class="form-group control-group row">
+                    <textarea class="form-control" name="message" rows="5" placeholder="<?= $this->t->translate('Message') ?>" id="message" required data-validation-required-message="<?= $this->t->translate('Please enter your message') ?>" minlength="5" data-validation-minlength-message="<?= $this->t->translate('Too short: Minimum of \'10\' characters') ?>" maxlength="999" data-validation-maxlength-message="<?= $this->t->translate('Too long: Maximum of \'999\' characters') ?>" style="resize:none"></textarea>
+                    <p class="help-block"></p>
+                </div>
+
+                <div class="form-group control-group row">
+                    <div class="g-recaptcha" data-sitekey="<?= $this->recaptcha_key ?>"></div>
+                    <span class="help-block">Please check that you are not a robot.</span>
+                </div>
+                
+                <div class="form-group row">                                               
+                    <button type="submit" class="btn btn-primary"><?= $this->t->translate('Send') ?></button>
+                    <button type="reset" class="btn btn-default"><?= $this->t->translate('Reset') ?></button>
+                </div>                        
+            </form>                                            
+        </div>                                      
+    </div>
+    <div id="loading"><div></div></div>
+<?php
+
+$currLang = $this->languages->getCurrentLanguage();
+$str = <<<EOD
+
+$(function() {
+
+ $("#contactForm").find("input,textarea").jqBootstrapValidation(
+    {
+     preventSubmit: true,
+
+     submitError: function(form, event, errors) {
+        
+     },
+     submitSuccess: function(form, event) {
+       $('#success').html('');
+      event.preventDefault(); // prevent default submit behaviour
+       
+       var name = $("input#name").val();  
+       var email = $("input#email").val(); 
+       var message = $("textarea#message").val();
+        var firstName = name; // For Success/Failure Message
+           // Check for white space in name for Success/Fail message
+        if (firstName.indexOf(' ') >= 0) {
+	   firstName = name.split(' ').slice(0, -1).join(' ');
+         }   
+        /*
+        var el = document.getElementById("g-captcha-response");
+        if(!el) {
+            // Fail message
+            $('#success').html("<div class='alert alert-danger'>");
+            $('#success > .alert-danger').html("<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;")
+             .append( "</button>");
+            $('#success > .alert-danger').append("<strong>reCAPTCHA checked failed!</strong>");
+            $('#success > .alert-danger').append('</div>');
+ 		
+            return false;
+        }
+        
+        var recaptcha = document.getElementById("g-captcha-response").value;     
+        */
+        var contactForm = $("#contactForm");
+        
+	 $.ajax({
+                url: "/$currLang/contact/send",
+            	type: "POST",
+            	data: contactForm.serialize(),// {"name": name, "email": email, "message": message, "g-recaptcha-response": recaptcha},
+                //timeout: 5000,
+            	cache: false,
+            	success: function(data) {  
+            	// Success message
+                if(data.error) {  
+                    $('#success').html("<div class='alert alert-danger'>");
+                    $('#success > .alert-danger').html("<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;").append( "</button>");
+                    $('#success > .alert-danger').append("<strong>"+data.message+"</strong>");
+                    $('#success > .alert-danger').append('</div>');                    
+                } else {
+                    $('#success').html("<div class='alert alert-success'>");
+                    $('#success > .alert-success').html("<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;").append( "</button>");
+                    $('#success > .alert-success').append("<strong>"+data.message+"</strong>");
+                    $('#success > .alert-success').append('</div>');                    
+                } 						    
+ 		//clear all fields
+ 		$('#contactForm').trigger("reset");
+ 	      },
+ 	   error: function() {		
+ 		// Fail message
+ 		$('#success').html("<div class='alert alert-danger'>");
+            	$('#success > .alert-danger').html("<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;")
+            	 .append( "</button>");
+            	$('#success > .alert-danger').append("<strong>Sorry "+firstName+" it seems that my mail server is not responding...</strong> Could you please email me directly to <a href='mailto:me@example.com?Subject=Message_Me from myprogrammingblog.com'>me@example.com</a> ? Sorry for the inconvenience!");
+ 	        $('#success > .alert-danger').append('</div>');
+ 		//clear all fields
+ 		$('#contactForm').trigger("reset");
+ 	    }
+           });
+         }
+       });
+
+      $("a[data-toggle=\"tab\"]").click(function(e) {
+                    e.preventDefault();
+                    $(this).tab("show");
+        });
+                
+        $("#contactForm").on('reset', function() {            
+            $("#contactForm").find("p.help-block").each(function() {
+                $(this).html('');
+            });            
+        });
+  });
+ 
+/*When clicking on Full hide fail/success boxes */ 
+$('#name').focus(function() {
+     $('#success').html('');
+  });
+EOD;
+$this->appendAfterBodyScript($str, false);
+?>

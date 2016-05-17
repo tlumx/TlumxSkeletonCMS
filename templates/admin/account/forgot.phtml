@@ -1,0 +1,98 @@
+<?php
+
+?><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="<?= $this->basePath ?>/images/favicon.ico">
+<title><?= $this->t->translate('Password recovery') ?></title>
+<style>
+body {background:#216594;font-family: Arial, Helvetica, sans-serif;}
+a {color:#fff;text-decoration: underline;}
+a:hover {color:#fff;text-decoration: none;}
+.forgot_box {margin: 0 auto;margin-top: 100px;padding: 30px;width: 350px;background-color: #1D4E6F;background: -moz-linear-gradient(#06549E, #013669 60%, #062A4C);background: -webkit-linear-gradient(#06549E, #013669 60%, #062A4C);background: -o-linear-gradient(#06549E, #013669 60%, #062A4C);background: -ms-linear-gradient(#06549E, #013669 60%, #062A4C);background: linear-gradient(#06549E, #013669 60%, #062A4C);border-radius: 2px;box-shadow: 0px 1px 2px #111;}
+.forgot_box h1 {text-align: center;font-size: 1.4em;color:#fff;margin: 10px;}
+.forgot_box input[type=submit] {width: 100%;display: block;margin:0 0 10px 0;}
+.forgot_box input[type=email]{width: 334px;height: 40px;font-size: 16px; margin:0 0 10px 0;background: #fff;border: 1px solid #555;padding: 0 8px;}
+.forgot_box input[type=email]:hover{-moz-box-shadow: inset 0 1px 2px #aaa;-webkit-box-shadow: inset 0 1px 2px #aaa;box-shadow: inset 0 1px 2px #aaa;}
+.forgot_box .submit {border: 0px;color: #fff;font-size: 14px;background-color:#6291DC;padding: 16px 0px;}
+.forgot_box .submit:hover {background-color:#406AAD;}
+.forgot-help{font-size: 12px;}
+#error {display:block;margin: 15px;line-height:1.4;font-size: 14px;font-weight:bold;text-align: left;color: #FF9B00;}
+</style>
+</head>
+<body>
+<?php if($this->action == 'confirm'): ?>
+    <?php if($this->error == ''):?>
+    <div class="forgot_box">
+        <div>
+            <p style="color:#fff;"><?=$this->t->translate('Your new password is confirmed')?></p>
+        </div>
+        <div class="forgot-help">
+            <a href="<?= $this->router->createPath('account_login'); ?>"><?= $this->t->translate('Login'); ?></a>
+        </div>
+    </div>    
+    <?php else:?>
+    <div class="forgot_box">
+        <div>
+            <p style="color:#fff;"><?=$this->t->translate('Your new password has not been confirmed. Please carefully check the information sent to you by e-mail.')?></p>
+        </div>
+        <div class="forgot-help">
+            <a href="<?= $this->router->createPath('account_login'); ?>"><?= $this->t->translate('Login'); ?></a>
+        </div>
+    </div>     
+    <?php endif;?>
+<?php elseif($this->action == 'complete'): ?>
+    <div class="forgot_box">
+        <div>
+            <p style="color:#fff;"><?=$this->t->translate('A new password has been sent to the email address of a specified user account. To confirm, click on the link in the email rozmeschschennoy.')?></p>
+        </div>
+        <div class="forgot-help">
+            <a href="<?= $this->router->createPath('account_login'); ?>"><?= $this->t->translate('Login'); ?></a>
+        </div>
+    </div>
+<?php else:?>
+    <div class="forgot_box">
+        <h1><?= $this->t->translate('Password recovery'); ?></h1>
+        <div id="error"><?= $this->error; ?></div>
+        <form id="forgot-form" method="POST" action="<?= $this->router->createPath('account_forgot_password'); ?>">
+            <input type="email" name="email" placeholder="<?= $this->t->translate('Your email'); ?>">
+            <input type="submit" name="submit" class="submit" value="<?= $this->t->translate('Recover'); ?>">
+        </form>
+        <div class="forgot-help">
+            <a href="<?= $this->router->createPath('account_login'); ?>"><?= $this->t->translate('Login'); ?></a>
+        </div>
+    </div>
+<?php endif;?>    
+<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>-->
+<script src="<?= $this->basePath ?>/js/jquery.min.js"></script>
+<script type="text/javascript">
+    function isValidEmail(email) {
+        var pattern = new RegExp(/^([a-z0-9_\.-])+@[a-z0-9-]+\.([a-z]{2,4}\.)?[a-z]{2,4}$/i);
+        return pattern.test(email);
+    }
+    
+    $(document).ready(function(){
+        $("#forgot-form").on('submit', function(){
+            if(this.email.value == '') {
+                $("div#error").css('display','block');
+                $("div#error").html("<?= $this->t->translate('E-mail should not be empty'); ?>");
+                return false;
+            }
+            if(!isValidEmail(this.email.value)) {
+                $("div#error").css('display','block');
+                $("div#error").html("<?= $this->t->translate('Please enter valid email'); ?>");
+                return false;
+            }
+            return true;
+        });
+        
+        $("#forgot-form :input").on('click',function(){
+            $("div#error").css('display','none');
+        });
+    });    
+</script>
+</body>
+</html>

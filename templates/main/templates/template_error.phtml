@@ -1,0 +1,23 @@
+<?php
+$title = $this->getTitle();
+if($title) {
+    $this->setTitle($title . ' :: ' . $this->message);
+} else {
+    $this->setTitle($this->message);
+}
+?><div class="container">           
+        <div class="page-header">
+            <h1><?= $this->t->translate('An error occurred') ?></h1>
+        </div>
+        <h2><?= $this->t->translate($this->message) ?></h2>
+<?php if (isset($this->exception) && $this->exception): ?>
+        <h3><?= $this->t->translate('Exception information') ?>:</h3>
+        <p>
+            <h3><?= $this->t->translate('Stack trace') ?>:</h3>
+            <pre><?= $this->exception->getTraceAsString() ?></pre>
+        </p>
+<?php endif; ?>
+    </div>
+    
+    
+

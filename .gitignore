@@ -1,0 +1,4 @@
+data/session/
+vendor
+composer.phar
+composer.lock

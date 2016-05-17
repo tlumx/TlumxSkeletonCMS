@@ -1,0 +1,69 @@
+<?php
+$title = $this->getTitle();
+if($title) {
+    $this->setTitle($title." :: ".$this->t->translate('Edit the text block'));
+} else {
+    $this->setTitle($this->t->translate('Edit the text block'));
+}
+?><div class="row">
+            <div class="col-lg-12">
+                <br>
+                <ol class="breadcrumb text-capitalize">
+                    <li><a href="<?= $this->router->createPath('index'); ?>"><?= $this->t->translate("Home"); ?></a></li>
+                    <li class="active text-lowercase"><?= $this->t->translate('Edit the text block') ?></li>
+                </ol>                    
+            </div>
+        </div>
+
+        <div class="page-header">
+        <h2><?= $this->t->translate('Edit the text block')." \"".$this->t->translate($this->blockName)."\"" ?></h2>
+        </div>
+
+        <div class="alert alert-info">
+<?php foreach ($this->languages->getLanguages() as $key=>$value): ?>
+            <a href="<?= $this->router->createPath($this->routeName, ['lang'=>$key]); ?>" class="btn btn-primary <?= ($this->currLang ==  $key) ? 'disabled' : '' ?>"><?= $value ?></a>
+<?php endforeach; ?>
+        </div>
+
+<?php if(isset($this->isSave)): ?>                
+        <div class="message-info-alert response-alert-ok">
+            <div class="alert alert-success">                
+                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                <span class="message"><?= $this->t->translate($this->isSave); ?>!</span>
+            </div>
+        </div>                
+<?php endif;?>
+        <form id="text-block-form" role="form" action="<?= $this->router->createPath($this->routeName, ['lang'=>$this->currLang]); ?>" method="POST">
+            <div class="control-group">
+                <!-- block-text -->
+                <div class="controls">
+                    <input type="text" class="form-control" id="block-text" name="block-text" value="<?= $this->text ?>" maxlength="999" data-validation-maxlength-message="<?= $this->t->translate('Too long: Maximum of \'999\' characters'); ?>" >
+                    <p class="help-block" style="color:#E80000;"></p>
+                </div>
+            </div>            
+            <br>    
+            <div class="control-group">
+               <div class="controls">
+                   <button type="submit" class="btn btn-primary"><?= $this->t->translate("Save"); ?></button>
+               </div>
+           </div>
+        </form><?php
+$this->appendAfterBodyScript($this->basePath.'/js/jqBootstrapValidation.js');
+$this->appendAfterBodyScript('$(function () { $("input").not("[type=submit]").jqBootstrapValidation(); } );', false);
+$this->appendAfterBodyScript('$("input").focus(function(e) { $("div.message-info-alert").html(""); }); ', false);
+
+$str = "   ". 
+"$(document).ready(function(){
+    function slideout(){
+        setTimeout(function(){
+            $(\".response-alert-ok\").slideUp(\"slow\", function () {
+        });
+        }, 3000);
+    }
+
+    slideout();
+})";
+if(isset($this->isSave)) {
+    $this->appendAfterBodyScript($str, false);  
+}
+?>

@@ -1,0 +1,141 @@
+<?php
+$router = $this->router;
+
+if(!$this->currRoute) {
+    $this->currRoute = 'index';
+}
+
+switch ($this->currRoute) {
+    case 'index':
+        $activeNav = 'index';
+    break;
+    case 'account_profile':
+    case 'account_change_password':
+        $activeNav = 'profile';
+    break;
+    case 'users_list':
+    case 'users_add':
+    case 'users_edit':
+    case 'users_delete':    
+        $activeNav = 'users';
+    break;
+    case 'filemanager':
+        $activeNav = 'filemanager';
+    break;
+    default:
+        $activeNav = 'modules';
+}
+
+?>
+<?= $this->getDoctype()."\n";?>
+<html lang="<?= $this->languages->getCurrentLanguage() ?>">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">    
+<meta name="description" content="">
+<meta name="author" content="">
+<?= $this->getMeta() ?>
+<?= $this->createTitle() ?>    
+<link rel="icon" href="<?= $this->basePath ?>/images/favicon.ico">
+<link href="<?= $this->basePath ?>/css/bootstrap.min.css" rel="stylesheet">
+<link href="<?= $this->basePath ?>/css/style.css" rel="stylesheet">        
+<?= $this->getStylesheets();?>
+<?= $this->getPlainCss();?>
+
+<?= $this->getHeadScripts(); ?>
+
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="<?= $this->basePath ?>/js/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <script src="<?= $this->basePath ?>/js/respond.min.js"></script>
+<![endif]-->
+</head>
+<body>
+    <nav class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-nav-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="<?= $this->router->createPath('index') ?>"><?= $this->t->translate('Administration') ?></a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse navbar-main-nav-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="<?php if($activeNav == 'index') {echo "active";} ?>"><a href="<?= $this->router->createPath('index') ?>"><span class="glyphicon glyphicon-home"></span> <?= $this->t->translate('Home') ?></a></li>
+                    <li class="<?php if($activeNav == 'filemanager') {echo "active";} ;?>"><a href="<?= $this->router->createPath('filemanager') ?>"><span class="glyphicon glyphicon-folder-open"></span> <?= $this->t->translate('File manager') ?></a></li>
+<?php if($this->userIdenty->getRole() == 'admin'): ?>                                        
+                                       
+                    <li class="dropdown <?php if($activeNav == 'users') {echo "active";} ?>">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> <?= $this->t->translate('Users') ?> <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="<?= $this->router->createPath('users_list') ?>"><span class="glyphicon glyphicon-th-list"></span> <?= $this->t->translate('User list') ?></a></li>
+                            <li><a href="<?= $this->router->createPath('users_add') ?>"><span class="glyphicon glyphicon-plus-sign"></span> <?= $this->t->translate('Add new user') ?></a></li>
+                        </ul>
+                    </li> 
+<?php endif;  ?>                    
+<?php if(!empty($this->modulesMenu)): ?>                    
+                    <li class="dropdown <?php if($activeNav == 'modules') {echo "active";} ?>">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-menu-hamburger"></span> <?= $this->t->translate('Modules') ?> <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+<?php foreach ($this->modulesMenu as $menuItem => $subMenus): ?>                            
+                            <li class="dropdown-submenu">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><?= $menuItem; ?></a>
+                                <ul class="dropdown-menu">
+<?php foreach ($subMenus as $subItem => $subItemRoute): ?>
+                                    <li><a href="<?= $subItemRoute; ?>"><?= $subItem; ?></a></li>
+<?php endforeach; ?>
+                                </ul>
+                            </li>
+<?php endforeach; ?>
+                        </ul>
+                    </li>
+<?php endif;?>                    
+                </ul>
+                
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="<?= $this->goToSiteLink ?>"><span class="glyphicon glyphicon-link"></span> <?= $this->t->translate('go to site') ?></a></li>
+                    <li class="dropdown <?php if($activeNav == 'profile') {echo "active";} ;?>">			
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span> <?= $this->userIdenty->getDisplayName() ?> <b class="caret"></b></a>
+                        <ul class="dropdown-menu">				
+                            <li><a href="<?= $this->router->createPath('account_profile') ?>"><span class="glyphicon glyphicon-edit"></span> <?= $this->t->translate('Profile') ?></a></li>
+                            <li><a href="<?= $this->router->createPath('account_change_password') ?>"><span class="glyphicon glyphicon-refresh"></span> <?= $this->t->translate('Change password') ?></a></li>
+                            <li class="divider"></li>
+                            <li><a href="<?= $this->router->createPath('account_logout') ?>"><span class="glyphicon glyphicon-off"></span> <?= $this->t->translate('Logout') ?></a></li>
+                        </ul>
+                    </li>   
+                </ul>                 
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+    
+    <!-- Begin page content -->
+    <div class="container">
+        <?php echo $this->content; ?>        
+    </div>
+        
+    <footer class="footer">
+        <div class="container">
+            <p class="pull-right"><a href="#"><span class="glyphicon glyphicon-arrow-up"></span><?= $this->t->translate('top') ?></a></p>			
+            <p>&copy;  <?=date('Y')?> . <?= $this->t->translate('All rights reserved.') ?> Powered by <a href="http://framework.tlumx.com">Tlumx Framework</a></p>            
+        </div>
+    </footer>     
+    
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>-->
+<script src="<?= $this->basePath ?>/js/jquery.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="<?= $this->basePath ?>/js/bootstrap.min.js"></script>  
+<?= $this->getAfterBodyScripts(); ?>    
+</body>
+</html>

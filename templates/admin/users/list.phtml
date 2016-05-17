@@ -1,0 +1,26 @@
+<?php
+$title = $this->getTitle();
+if($title) {
+    $this->setTitle($title." :: ".$this->t->translate('User list'));
+} else {
+    $this->setTitle($this->t->translate('User list'));
+}
+?><div class="page-header">
+            <h2><?= $this->t->translate('User list'); ?></h2>
+        </div>
+        <p>
+            <a class="btn btn-info" href="<?= $this->router->createPath('users_add'); ?>"><span class="glyphicon glyphicon-plus"></span>&nbsp;<?= $this->t->translate('New user'); ?></a>
+        </p>
+        <table class="table table-hover">
+            <tbody style="border-bottom: 1px solid #ccc;">
+<?php foreach ($this->users as $id => $name): ?>
+                <tr>
+                    <td><?= $name; ?></td>
+                    <td class="text-right">
+                        <a class="btn btn-small btn-warning" href="<?= $this->router->createPath('users_edit', ['user_id'=>$id]) ?>"><span class="glyphicon glyphicon-edit"></span>&nbsp;<?= $this->t->translate('Edit'); ?></a>
+                        <a class="btn btn-small btn-danger <?= ($this->userIdenty->getUsername() == $name) ? 'disabled' : '' ?>" href="<?= ($this->myUsername == $name) ? '#' : $this->router->createPath('users_delete', ['user_id'=>$id]); ?>"><span class="glyphicon glyphicon-trash"></span>&nbsp;<?= $this->t->translate('Delete'); ?></a>
+                    </td>
+                </tr>
+<?php endforeach; ?>
+            </tbody>
+        </table>

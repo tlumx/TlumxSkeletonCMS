@@ -1,0 +1,22 @@
+<?php
+
+$title = $this->getTitle();
+if($title) {
+    $this->setTitle($title . ' :: ' . $this->t->translate('Home'));
+} else {
+    $this->setTitle($this->t->translate('Home'));
+}
+?><div class="jumbotron">
+        <div class="container">
+            <h1><?= $this->t->translate('hello_world') ?></h1>
+            <p><?= $this->information ?></p>
+            <p><a class="btn btn-primary btn-lg" href="#" role="button"><?= $this->t->translate('Learn more') ?> &raquo;</a></p>
+        </div>
+    </div>        
+
+    <div class="container">           
+        <div class="page-header">
+            <h2><?= $this->t->translate('Welcome') ?></h2>
+        </div>
+        <?= $this->home ?>
+    </div>

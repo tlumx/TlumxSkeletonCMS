@@ -1,0 +1,125 @@
+<?php
+if(!$this->currRoute) {
+    $this->currRoute = 'index';
+}
+
+if($this->languages->isCurrentDefault()) {
+    $routeLang = '';
+} else {
+    $routeLang = '/'.$this->languages->getCurrentLanguage();
+}
+
+switch ($this->currRoute) {
+    case 'index':
+    case 'index_lang':    
+        $activeNav = 'index';
+    break;
+    case 'about':
+    case 'about_lang':    
+        $activeNav = 'about';
+    break;
+    case 'contact':
+    case 'contact_lang':    
+        $activeNav = 'contact';
+    break;
+    default:
+        $activeNav = 'contact';
+}
+
+$langRouteName = $this->currRoute;
+$langRouteNameNoLang = $this->currRoute;
+if(substr($this->currRoute, -5, 5) == '_lang' ) {
+    $len = strlen($this->currRoute) -5;    
+    $langRouteNameNoLang = substr($this->currRoute, 0, $len);    
+} else {
+    $langRouteName .= '_lang';
+}
+
+echo $this->getDoctype()."\n";?>
+<html lang="<?= $this->languages->getCurrentLanguage() ?>">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">        
+    <?= $this->getMeta() ?>
+    <?= $this->createTitle() ?> 
+    <link rel="icon" href="<?= $this->basePath ?>/favicon.ico">
+
+    <!-- Bootstrap core CSS -->
+    <link href="<?= $this->basePath ?>/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="<?= $this->basePath ?>/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="<?= $this->basePath ?>/css/main.css" rel="stylesheet">
+
+    <?= $this->getStylesheets();?>
+    <?= $this->getPlainCss();?>        
+    
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="<?= $this->basePath ?>/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="<?= $this->basePath ?>/js/ie-emulation-modes-warning.js"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    
+    <?= $this->getHeadScripts(); ?>    
+</head>
+<body>
+    <nav class="navbar navbar-blue navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="<?= $this->basePath.$routeLang ? $this->basePath.$routeLang : '/' ?>">Project name</a>
+            </div>
+            <div id="navbar" class="collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li <?= ($activeNav == 'index') ? "class=\"active\"" : '' ?>><a href="<?= $this->basePath.$routeLang ? $this->basePath.$routeLang : '/' ?>">Home</a></li>
+                    <li <?= ($activeNav == 'about') ? "class=\"active\"" : '' ?>><a href="<?= $this->basePath.$routeLang ?>/about">About</a></li>
+                    <li <?= ($activeNav == 'contact') ? "class=\"active\"" : '' ?>><a href="<?= $this->basePath.$routeLang ?>/contact">Contact</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+<?php foreach ($this->languages->getLanguages() as $key => $lang): ?>
+<?php if($this->languages->getCurrentLanguage() == $key) : ?>
+                    <li class="active-lang"><a href="#"><?= $lang?></a></li>                    
+<?php elseif($this->languages->getDefaultLanguage() == $key) : ?>                    
+                    <li><a href="<?= $this->router->createPath($langRouteNameNoLang, $this->currRouteParams);?>"><?= $lang?></a></li>
+<?php else:?>
+                    <li><a href="<?= $this->router->createPath($langRouteName, array_merge($this->currRouteParams, ['lang' => $key]));?>"><?= $lang?></a></li>
+<?php endif;?>                    
+<?php endforeach; ?>                    
+                </ul>            
+            </div><!--/.nav-collapse -->
+        </div>
+    </nav>
+
+    <?php echo $this->content ?>        
+
+    <footer class="footer">
+        <div class="container">
+            <p class="text-muted text-center">Powered by <a href="http://framework.tlumx.xyz" title="Tlumx Framework">Tlumx Framework</a></p>
+        </div>
+    </footer>
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster --
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>-->
+    <script>window.jQuery || document.write('<script src="<?= $this->basePath ?>/js/jquery.min.js"><\/script>')</script>
+    <script src="<?= $this->basePath ?>/js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="<?= $this->basePath ?>/js/ie10-viewport-bug-workaround.js"></script>
+    <?= $this->getAfterBodyScripts(); ?>
+</body>
+</html>

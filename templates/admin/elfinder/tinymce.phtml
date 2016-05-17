@@ -1,0 +1,81 @@
+<?php
+$connectorUri = $this->router->createPath('filemanager_connector');
+
+$lang = $this->languages->getCurrentLanguage();
+if($lang == 'ja') {
+    $lang = 'jp';
+} elseif ($lang == 'pt') {
+    $lang = 'pt_BR';
+} elseif($lang == 'zh') {
+    $lang = 'zh_TW';
+}
+?><!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title><?= $this->t->translate('File manager') ?></title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2" />
+<link href="<?= $this->basePath ?>/css/jquery-ui.css" rel="stylesheet">
+<link href="<?= $this->basePath ?>/css/elfinder.min.css" rel="stylesheet">
+<link href="<?= $this->basePath ?>/css/theme.css" rel="stylesheet">
+
+<script src="<?= $this->basePath ?>/js/jquery.min.js"></script>
+<script src="<?= $this->basePath ?>/js/jquery-ui.min.js"></script>
+
+<script src="<?= $this->basePath ?>/js/elfinder/elfinder.min.js"></script>
+<?php if($lang != 'en'){ echo "<script src=\"".$this->basePath."/js/elfinder/i18n/elfinder.".$lang.".js\"></script>";} ?>
+<script type="text/javascript">
+    var FileBrowserDialogue = {
+        init: function() {
+            // Here goes your code for setting your custom things onLoad.
+        },
+        mySubmit: function (file, fm) {
+            // pass selected file data to TinyMCE
+            parent.tinymce.activeEditor.windowManager.getParams().oninsert(file, fm);
+            // close popup window
+            parent.tinymce.activeEditor.windowManager.close();
+        }
+    };
+    
+    $().ready(function() {
+        
+        var elfinderInstance = $('#elfinder').elfinder({
+            resizable: false,
+            height: $(window).height() - 20,
+            ui  : ['toolbar', 'places', 'tree', 'path', 'stat'],
+            url : '<?= $connectorUri ?>',
+            lang: '<?= $lang?>',                     
+            getFileCallback: function(file) {
+                FileBrowserDialogue.mySubmit(file, elfinderInstance); 
+            }
+        }).elfinder('instance');        
+
+        var title = document.title;
+        elfinderInstance.bind('open', function(event) {
+            var data = event.data || null;
+            var path = '';
+
+            if (data && data.cwd) {
+                path = elfinderInstance.path(data.cwd.hash) || null;
+            }
+            document.title =  path? path + ':' + title : title;
+        });        
+        
+
+        var resizeTimer = null;
+        $(window).resize(function() {
+            resizeTimer && clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function() {
+                var h = parseInt($(window).height()) - 20;
+                if (h != parseInt($('#elfinder').height())) {
+                    elfinderInstance.resize('100%', h);
+                }
+            }, 200);
+        });                
+    });
+</script>
+</head>
+<body>    
+    <div id="elfinder"></div>    
+</body>
+</html>

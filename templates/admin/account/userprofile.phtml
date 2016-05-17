@@ -1,0 +1,70 @@
+<?php
+$title = $this->getTitle();
+if($title) {
+    $this->setTitle($title." :: ".$this->t->translate('User profile'));
+} else {
+    $this->setTitle($this->t->translate('User profile'));
+}
+?><div class="page-header">
+        <h2><?= $this->t->translate('User profile'); ?></h2>
+        </div>
+<?php if(isset($this->showAlert)): ?>
+        <div class="message-info-alert">
+            <div class="alert alert-danger alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                <span class="sr-only">Error:</span>
+                <?= $this->t->translate($this->showAlert);?>
+            </div>
+        </div>
+<?php endif; ?>
+<?php if(isset($this->isSave)): ?>
+        <div class="message-info-alert response-alert">
+            <div class="alert alert-success">
+                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                <span class="message"><?= $this->t->translate('The data is stored'); ?>!</span>
+            </div>
+        </div>
+<?php endif;?>
+        <form id="profile-user-form" role="form" action="<?= $this->router->createPath('account_profile'); ?>" method="POST" novalidate>            
+            <div class="control-group">
+                <!-- E-mail -->
+                <label class="control-label" for="email"><?= $this->t->translate('E-mail'); ?></label>
+                <div class="controls">
+                    <input type="email" class="form-control" id="email" name="email" value="<?= $this->user->getEmail(); ?>" maxlength="255" data-validation-maxlength-message="<?= $this->t->translate('Too long: Maximum of \'255\' characters'); ?>" data-validation-email-message="<?= $this->t->translate('Invalid e-mail address'); ?>" data-validation-required-message="<?= $this->t->translate('Required to fill'); ?>" data-validation-ajax-ajax="<?= $this->router->createPath('users_check_email', ['user_id'=>$this->user->getId()]); ?>" required>
+                    <p class="help-block" style="color:#E80000;"></p>
+                </div>
+            </div>            
+            <div class="control-group">
+                <!-- Display name -->
+                <label class="control-label" for="display_name"><?= $this->t->translate('Display Name'); ?></label>
+                <div class="controls">
+                    <input type="text" class="form-control" id="display_name" name="display_name" value="<?= $this->user->getDisplayName(); ?>" maxlength="255" data-validation-maxlength-message="<?= $this->t->translate('Too long: Maximum of \'255\' characters'); ?>" minlength="4" data-validation-minlength-message="<?= $this->t->translate('Too short: Minimum of \'4\' characters'); ?>" data-validation-required-message="<?= $this->t->translate('Required to fill'); ?>" required>
+                    <p class="help-block" style="color:#E80000;"></p>
+                </div>
+            </div>
+            <br>    
+            <div class="control-group">
+               <div class="controls">
+                   <button type="submit" class="btn btn-primary"><?= $this->t->translate('Save'); ?></button>
+               </div>
+           </div>
+        </form><?php
+$this->appendAfterBodyScript($this->basePath.'/js/jqBootstrapValidation.js');
+$this->appendAfterBodyScript('$(function () { $("input").not("[type=submit]").jqBootstrapValidation(); } );', false);
+$this->appendAfterBodyScript('$("input").focus(function(e) { $("div.message-info-alert").html(""); }); ', false);
+$str = "   ". 
+"$(document).ready(function(){
+    function slideout(){
+        setTimeout(function(){
+            $(\".response-alert\").slideUp(\"slow\", function () {
+        });
+        }, 2000);
+    }
+
+    slideout();
+})";
+if(isset($this->isSave)) {
+    $this->appendAfterBodyScript($str, false);  
+}
+?>

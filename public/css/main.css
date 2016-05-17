@@ -1,0 +1,94 @@
+html {
+    position: relative;
+    min-height: 100%;
+}
+body {
+    padding-top: 50px;
+    margin-bottom: 60px;
+}
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 60px;
+    background-color: #f9f9f9;
+    border-top: 1px solid #e5e5e5;    
+}
+
+body > .container {
+    padding: 15px 15px 0;
+}
+
+
+.navbar-blue {
+    background: #0D196F;//#1B2A96;//#062056;
+    
+}
+
+.navbar-blue .navbar-brand {
+    color:#FFEF00;
+    font-weight: bold;
+}
+
+.navbar-blue .navbar-toggle{
+    background: #333;
+}
+.navbar-blue .navbar-toggle .icon-bar{    
+    background: #fff;
+}
+
+.navbar-blue .navbar-nav>li>a{
+    color:#fff;
+}
+.navbar-blue .navbar-nav>li:hover>a{
+    color:#FFEF00;
+    background: #0D1654;
+}
+.navbar-blue .navbar-nav>li.active {
+    background: #0D1654;
+}
+.navbar-blue .navbar-nav>li.active-lang {
+    background: #0D1654;
+    
+}
+.navbar-blue .navbar-nav>li.active-lang a{
+    //background: #0D1654;
+    color:#FFEF00;
+}
+
+
+.navbar-blue .navbar-nav>li a:focus {
+    background: #0D196F;
+}
+
+
+.jumbotron {
+    background-color: #192D75;
+    color: #A0A5B7;
+}
+
+
+.container .text-muted {
+    margin: 20px 0;
+}
+
+
+.footer > .container {
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+code {
+    font-size: 80%;
+}
+
+
+#contact-form > h3{padding: 0;margin: 0 0 20px 0;}
+p.help-block ul li {list-style: none;color:#ff0000;}
+p.help-block ul {padding-left: 5px;}
+.success-contact-group {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+#loading{display: none;position: fixed;left: 0px;top: 0px;width: 100%;height: 100%;z-index: 9999;background:#292929;opacity: 0.7;}
+#loading div {width: 100%; height: 100%;background:url(../images/ajax-indicator.gif) center center no-repeat;}

@@ -1,0 +1,14 @@
+<?php
+$title = $this->getTitle();
+if($title) {
+    $this->setTitle($title . ' :: ' . $this->message);
+} else {
+    $this->setTitle($this->message);
+}
+?><div class="container">
+        <h2><?= $this->t->translate($this->message) ?></h2>
+        <h2>405</h2>
+    </div>
+    
+    
+

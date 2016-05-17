@@ -1,0 +1,7 @@
+<?php
+$title = $this->getTitle();
+if($title) {
+    $this->setTitle($title." :: ".$this->t->translate('Home'));
+} else {
+    $this->setTitle($this->t->translate('Home'));
+}
