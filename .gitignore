@@ -1,4 +1,4 @@
-data/session/*
+data/session/*.*
 vendor
 composer.phar
 composer.lock
